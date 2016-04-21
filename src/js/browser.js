@@ -136,8 +136,7 @@ $(function(){
      reset = data.reset && parseFloat(data.reset) > 0 ? parseFloat(data.reset) : false;
 
      $('*').on('click mousedown mouseup mousemove touch touchstart touchend keypress keydown',active);
-
-     currentURL = defaultURL = data.url;
+     currentURL = defaultURL = data.url[window.urlNumber || 0];
      useragent = data.useragent;
      loadContent();
 
@@ -221,7 +220,7 @@ $(function(){
      .on('loadcommit',function(e){
 	      if(useragent) e.target.setUserAgentOverride(useragent);
      })
-     .attr('src',currentURL)
+     .attr('src', currentURL)
      .prependTo('body');
      if(resetcache) {
        chrome.storage.local.remove('resetcache');

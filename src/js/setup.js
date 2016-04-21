@@ -13,7 +13,7 @@ $(function(){
     document.getElementById("host").appendChild(opt);
   }
 
-  if(data.url) $('#url').val(data.url).siblings('label').addClass('active');
+  if(data.url) $('#url').val(data.url.join(", ")).siblings('label').addClass('active');
   if(data.local) {
     $("#local").prop("checked",true);
     $('.local, .settings-detail').removeClass('disabled');
@@ -174,7 +174,7 @@ $(function(){
   $('#save').click(function(e){
     e.preventDefault();
     var error = [];
-    var url = $('#url').val();
+    var url = $('#url').val().split(", ");
     var host = $('#host').val();
     var remote = $("#remote").is(':checked');
     var local = $("#local").is(':checked');
@@ -212,11 +212,11 @@ $(function(){
         error.push("Reset interval is required.");
       }
     }
-    if(url && (url.indexOf("http://") >= 0 || url.indexOf("https://") >= 0 )){
-      //url is valid
-    }else{
-      error.push("Content URL must be valid.");
-    }
+    // if(url && (url.indexOf("http://") >= 0 || url.indexOf("https://") >= 0 )){
+    //   //url is valid
+    // }else{
+    //   error.push("Content URL must be valid.");
+    // }
     if((remote || local)){
       if(!username){
         error.push("Username is required.");
