@@ -12,8 +12,21 @@ $(function(){
     opt.innerText = interface.name + " - " + interface.address;
     document.getElementById("host").appendChild(opt);
   }
-
-  if(data.url) $('#url').val(data.url).siblings('label').addClass('active');
+  $('#addUrlButton').click(function(e) {
+    $('#urlInputs').append('<input data-id="url" type="text">');
+  });
+  if(data.url) {
+    if(typeof data.url === "string") {
+      data = {
+        url: [data.url]
+      }
+    }
+    for (var url of data.url) {
+      $('#urlInputs').append('<input data-id="url" type="text" value="' + url + '">');
+    }
+  } else {
+    $('#urlInputs').append('<input data-id="url" type="text">');
+  }
   if(data.local) {
     $("#local").prop("checked",true);
     $('.local, .settings-detail').removeClass('disabled');
@@ -163,18 +176,28 @@ $(function(){
 
   function setLocalContentURL(){
     if($("#servelocal").is(':checked')){
-      $('#url').val('http://127.0.0.1:'+$('#servelocalport').val()+'/').siblings('label').addClass('active');
+      $('#url-0').val('http://127.0.0.1:'+$('#servelocalport').val()+'/').siblings('label').addClass('active');
     }else{
-      $('#url').val('').siblings('label').removeClass('active');
+      $('#url-0').val('').siblings('label').removeClass('active');
     }
   }
 
-  $('#url').focus();
+  $('#url-0').focus();
 
   $('#save').click(function(e){
     e.preventDefault();
     var error = [];
-    var url = $('#url').val();
+    var url = [];
+    var urlInputs = $("[data-id='url']");
+    $.each(urlInputs, function(index, urlInput) {
+      var urlValue = $(urlInput).val().trim();
+      if(urlValue && (urlValue.indexOf("http://") >= 0 || urlValue.indexOf("https://") >= 0 )) {
+        url.push(urlValue)
+      }
+    });
+    if(url.length == 0) {
+      error.push("Content URL must be valid.");
+    }
     var host = $('#host').val();
     var remote = $("#remote").is(':checked');
     var local = $("#local").is(':checked');
@@ -211,11 +234,6 @@ $(function(){
         reset = false;
         error.push("Reset interval is required.");
       }
-    }
-    if(url && (url.indexOf("http://") >= 0 || url.indexOf("https://") >= 0 )){
-      //url is valid
-    }else{
-      error.push("Content URL must be valid.");
     }
     if((remote || local)){
       if(!username){

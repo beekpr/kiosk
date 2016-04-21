@@ -35,7 +35,7 @@ $(function(){
   $('#save').click(function(e){
     e.preventDefault();
     var error = [];
-    var url = $('#url').val();
+    var url = $('#url').val().split(', ');
     var username = $("#username").val();
     var password = $("#password").val();
     var passwordConfirm = $("#confirm_password").val();

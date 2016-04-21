@@ -14,7 +14,7 @@ function init() {
 
       // Sleepmode may not have been selected by user in setup because it
       // is a new config param, so assume the previous hard-coded value as
-      // default. 
+      // default.
       if (!data.sleepmode) {
         chrome.storage.local.set({'sleepmode': 'display'});
         data.sleepmode = 'display';
@@ -37,7 +37,7 @@ function init() {
         //make setup page available remotely via HTTP
         startWebserver(data.host,data.port,'www',data);
       }
-      openWindow("windows/browser.html");
+      openWindow("windows/browser.html", true);
     }else{
       //need to run setup
       openWindow("windows/setup.html");
@@ -67,26 +67,40 @@ function init() {
     }
   });
 
-  function openWindow(path){
-    if(win) win.close();
-    chrome.system.display.getInfo(function(d){
-      chrome.app.window.create(path, {
-        'frame': 'none',
-        'id': 'browser',
-        'state': 'fullscreen',
-        'bounds':{
-           'left':0,
-           'top':0,
-           'width':d[0].bounds.width,
-           'height':d[0].bounds.height
+  function openWindow(path, onAll){
+    if(win && win.length > 0) {
+      for (wi of win) {
+        wi.close();
+      }
+    }
+    chrome.system.display.getInfo(function(displayInfos){
+      win = [];
+      for (var i = 0; i < displayInfos.length; i++) {
+        display = displayInfos[i];
+        chrome.app.window.create(path, {
+          'frame': 'none',
+          'id': 'browser-' + i,
+          'state': 'fullscreen',
+          'outerBounds': {
+            'left': display.workArea.left,
+            'top': display.workArea.top,
+            'width':display.workArea.width,
+            'height':display.workArea.height
+          }
+        }, function(w){
+            win.push(w);
+            if (w && w.contentWindow) {
+              w.contentWindow.urlNumber = parseInt(w.id.split("-")[1]);
+            }
+            w.fullscreen();
+            setTimeout(function(){
+              w.fullscreen();
+            }, 1000);
+        });
+        if (!onAll) {
+          break;
         }
-      },function(w){
-        win = w;
-        win.fullscreen();
-        setTimeout(function(){
-          win.fullscreen();
-        },1000);
-      });
+      }
     });
   }
 

@@ -136,8 +136,15 @@ $(function(){
      reset = data.reset && parseFloat(data.reset) > 0 ? parseFloat(data.reset) : false;
 
      $('*').on('click mousedown mouseup mousemove touch touchstart touchend keypress keydown',active);
-
-     currentURL = defaultURL = data.url;
+     var url;
+     if (typeof data.url === 'string') {
+       url = data.url;
+     } else if (window.urlNumber && data.url.length > window.urlNumber) {
+       url = data.url[window.urlNumber];
+     } else {
+       url = data.url[0];
+     }
+     currentURL = defaultURL = url;
      useragent = data.useragent;
      loadContent();
 
@@ -221,7 +228,7 @@ $(function(){
      .on('loadcommit',function(e){
 	      if(useragent) e.target.setUserAgentOverride(useragent);
      })
-     .attr('src',currentURL)
+     .attr('src', currentURL)
      .prependTo('body');
      if(resetcache) {
        chrome.storage.local.remove('resetcache');

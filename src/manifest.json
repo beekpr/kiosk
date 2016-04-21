@@ -1,11 +1,11 @@
 {
-  "name": "Kiosk",
+  "name": "Kiosk patched by Beekeeper",
   "description": "Launch any URL as a full-screen kiosk.",
   "manifest_version": 2,
-  "version": "5.7.0",
+  "version": "5.7.1",
   "author": {
-    "name": "ZEBRADOG",
-    "email": "support@zebradog.com"
+    "name": "Beekeeper AG",
+    "email": "filip@beekeeper.io"
   },
   "kiosk_enabled": true,
   "offline_enabled": true,
