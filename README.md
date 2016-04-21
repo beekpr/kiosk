@@ -100,6 +100,24 @@ Pull requests are welcome.
 - [OSX menu bar will show on hover.](https://github.com/zebradog/kiosk/issues/41)
 
 ##Changelog
+
+- v5.7.0
+    - Sleep/screensaver mode configurable
+
+- v5.6.0
+  - Allow files to be served from local directory
+  - Add option to clear cache on save
+  - Add option to set custom user agent
+  - Bug fix: Reload will now work correctly on all systems.
+
+- v5.5.2
+  - Bug fix: Correctly focus form-fields on load.
+  - Bug fix: Save cookies, etc. across sessions.
+  - Bug fix: 1:00 or 2:00 AM/PM restart time now loads correctly.
+  - Change default remote management port to 8080 since 80 is blocked on ChromeOS.
+  - Allow videos in content to go full screen.
+  - Prevent exiting fullscreen by pressing escape
+
 - v5.5.1
   - Fixed bug: users on 5.4.0 with scheduling enabled experience rapid polling upon upgrade to 5.5.0. 
   

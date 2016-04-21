@@ -15,6 +15,11 @@ $(function(){
   var disabledrag = false;
   var disabletouchhighlight = false;
   var disableselection = false;
+  var useragent = '';
+  var resetcache = false;
+
+  //prevent existing fullscreen on escape key press
+  window.onkeydown = window.onkeyup = function(e) { if (e.keyCode == 27) { e.preventDefault(); } };
 
   function updateSchedule(){
     $.getJSON(scheduleURL, function(s) {
@@ -106,7 +111,10 @@ $(function(){
        if(now.isAfter(restart)) restart.add(1,'d'); //if we're past the time today, do it tomorrow
        setInterval(function(){
           var now = moment();
-          if(now.isAfter(restart)) chrome.runtime.reload();
+          if(now.isAfter(restart)) {
+            chrome.runtime.restart(); //for ChromeOS devices in "kiosk" mode
+            chrome.runtime.sendMessage('reload'); //all other systems
+          }
         },60*1000);
      }
 
@@ -123,12 +131,14 @@ $(function(){
      disabledrag = data.disabledrag ? true : false;
      disabletouchhighlight = data.disabletouchhighlight ? true : false;
      disableselection = data.disableselection ? true : false;
+     resetcache = data.resetcache ? true : false;
 
      reset = data.reset && parseFloat(data.reset) > 0 ? parseFloat(data.reset) : false;
 
      $('*').on('click mousedown mouseup mousemove touch touchstart touchend keypress keydown',active);
 
      currentURL = defaultURL = data.url;
+     useragent = data.useragent;
      loadContent();
 
   });
@@ -150,8 +160,8 @@ $(function(){
   }
 
   function loadContent(){
-     active(); //we should reset the active on load content as well
-    $('<webview id="browser"/>')
+    active(); //we should reset the active on load content as well
+    var webview = $('<webview id="browser"/>')
      .css({
        width:'100%',
        height:'100%',
@@ -190,6 +200,8 @@ $(function(){
              $('#mediaPermission').openModal();
            }
          });
+       }else if(e.originalEvent.permission === 'fullscreen') {
+          e.originalEvent.request.allow();
        }
      })
      .on('contentload',function(e){
@@ -204,10 +216,30 @@ $(function(){
          browser.insertCSS({code:"*{-webkit-tap-highlight-color: rgba(0,0,0,0); -webkit-touch-callout: none;}"});
        if(disableselection)
          browser.insertCSS({code:"*{-webkit-user-select: none; user-select: none;}"});
+       browser.focus();
+     })
+     .on('loadcommit',function(e){
+	      if(useragent) e.target.setUserAgentOverride(useragent);
      })
      .attr('src',currentURL)
      .prependTo('body');
-
+     if(resetcache) {
+       chrome.storage.local.remove('resetcache');
+       resetcache = false;
+       var clearDataType = {
+         appcache: true,
+         cache: true, //remove entire cache
+         cookies: true,
+         fileSystems: true,
+         indexedDB: true,
+         localStorage: true,
+         webSQL: true,
+       };
+       webview[0].clearData({since: 0}, clearDataType, function() {
+         $("#browser").remove();
+         loadContent();
+       });
+     }
   }
 
   function onEnded(event){
