@@ -19,12 +19,7 @@ $(function(){
   if(data.url && data.url.length > 0) {
     for (var i = 0; i < data.url.length; i++) {
       url = data.url[i];
-      var urlInput= $('#url-' + i).first();
-      if (urlInput) {
-        $(urlInput).val(url).siblings('label').addClass('active');
-      } else {
-        $('#urlInputs').append('<input id="url-' + i + '" type="text" value="' + url + '"/>');
-      }
+      $('#urlInputs').append('<input data-id="url" type="text" value="' + url + '"/>');
     }
   }
   if(data.local) {
@@ -188,15 +183,16 @@ $(function(){
     e.preventDefault();
     var error = [];
     var url = [];
-    var urlInputs = $("#urlInputs input");
-    for (var i = 0; i < urlInputs.length; i++) {
-      var urlValue = $(urlInputs[i]).val()
-      if(urlValue && (urlValue.indexOf("http://") >= 0 || urlValue.indexOf("https://") >= 0 )){
+    var urlInputs = $("[data-id='url']");
+    urlInputs.forEach(function(url) {
+      var urlValue = $(url).val()
+      if(urlValue && (urlValue.indexOf("http://") >= 0 || urlValue.indexOf("https://") >= 0 )) {
         url.push(urlValue)
-      }else{
+      } else {
         error.push("Content URL must be valid.");
       }
-    }
+
+    });
     var host = $('#host').val();
     var remote = $("#remote").is(':checked');
     var local = $("#local").is(':checked');
