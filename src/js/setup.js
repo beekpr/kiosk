@@ -15,7 +15,12 @@ $(function(){
   $('#addUrlButton').click(function(e) {
     $('#urlInputs').append('<input data-id="url" type="text">');
   });
-  if(data.url && data.url.length > 0) {
+  if(data.url) {
+    if(typeof data.url === "string") {
+      data = {
+        url: [data.url]
+      }
+    }
     for (var url of data.url) {
       $('#urlInputs').append('<input data-id="url" type="text" value="' + url + '">');
     }

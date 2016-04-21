@@ -137,7 +137,9 @@ $(function(){
 
      $('*').on('click mousedown mouseup mousemove touch touchstart touchend keypress keydown',active);
      var url;
-     if (window.urlNumber && data.url.length > window.urlNumber) {
+     if (typeof data.url === 'string') {
+       url = data.url;
+     } else if (window.urlNumber && data.url.length > window.urlNumber) {
        url = data.url[window.urlNumber];
      } else {
        url = data.url[0];
