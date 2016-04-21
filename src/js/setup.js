@@ -12,8 +12,21 @@ $(function(){
     opt.innerText = interface.name + " - " + interface.address;
     document.getElementById("host").appendChild(opt);
   }
-
-  if(data.url) $('#url').val(data.url.join(", ")).siblings('label').addClass('active');
+  $('#addUrlButton').click(function(e) {
+    var i = $('#urlInputs input').length + 1;
+    $('#urlInputs').append('<input id="url-' + i + '" type="text" />');
+  });
+  if(data.url && data.url.length > 0) {
+    for (var i = 0; i < data.url.length; i++) {
+      url = data.url[i];
+      var urlInput= $('#url-' + i).first();
+      if (urlInput) {
+        $(urlInput).val(url).siblings('label').addClass('active');
+      } else {
+        $('#urlInputs').append('<input id="url-' + i + '" type="text" value="' + url + '"/>');
+      }
+    }
+  }
   if(data.local) {
     $("#local").prop("checked",true);
     $('.local, .settings-detail').removeClass('disabled');
@@ -163,18 +176,27 @@ $(function(){
 
   function setLocalContentURL(){
     if($("#servelocal").is(':checked')){
-      $('#url').val('http://127.0.0.1:'+$('#servelocalport').val()+'/').siblings('label').addClass('active');
+      $('#url-0').val('http://127.0.0.1:'+$('#servelocalport').val()+'/').siblings('label').addClass('active');
     }else{
-      $('#url').val('').siblings('label').removeClass('active');
+      $('#url-0').val('').siblings('label').removeClass('active');
     }
   }
 
-  $('#url').focus();
+  $('#url-0').focus();
 
   $('#save').click(function(e){
     e.preventDefault();
     var error = [];
-    var url = $('#url').val().split(", ");
+    var url = [];
+    var urlInputs = $("#urlInputs input");
+    for (var i = 0; i < urlInputs.length; i++) {
+      var urlValue = $(urlInputs[i]).val()
+      if(urlValue && (urlValue.indexOf("http://") >= 0 || urlValue.indexOf("https://") >= 0 )){
+        url.push(urlValue)
+      }else{
+        error.push("Content URL must be valid.");
+      }
+    }
     var host = $('#host').val();
     var remote = $("#remote").is(':checked');
     var local = $("#local").is(':checked');
@@ -212,11 +234,6 @@ $(function(){
         error.push("Reset interval is required.");
       }
     }
-    // if(url && (url.indexOf("http://") >= 0 || url.indexOf("https://") >= 0 )){
-    //   //url is valid
-    // }else{
-    //   error.push("Content URL must be valid.");
-    // }
     if((remote || local)){
       if(!username){
         error.push("Username is required.");

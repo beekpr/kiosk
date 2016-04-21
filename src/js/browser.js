@@ -136,7 +136,13 @@ $(function(){
      reset = data.reset && parseFloat(data.reset) > 0 ? parseFloat(data.reset) : false;
 
      $('*').on('click mousedown mouseup mousemove touch touchstart touchend keypress keydown',active);
-     currentURL = defaultURL = data.url[window.urlNumber || 0];
+     var url;
+     if (window.urlNumber && data.url.length > window.urlNumber) {
+       url = data.url[window.urlNumber];
+     } else {
+       url = data.url[0];
+     }
+     currentURL = defaultURL = url;
      useragent = data.useragent;
      loadContent();
 
