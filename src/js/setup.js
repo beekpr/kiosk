@@ -13,14 +13,14 @@ $(function(){
     document.getElementById("host").appendChild(opt);
   }
   $('#addUrlButton').click(function(e) {
-    var i = $('#urlInputs input').length + 1;
-    $('#urlInputs').append('<input id="url-' + i + '" type="text" />');
+    $('#urlInputs').append('<input data-id="url" type="text">');
   });
   if(data.url && data.url.length > 0) {
-    for (var i = 0; i < data.url.length; i++) {
-      url = data.url[i];
-      $('#urlInputs').append('<input data-id="url" type="text" value="' + url + '"/>');
+    for (var url of data.url) {
+      $('#urlInputs').append('<input data-id="url" type="text" value="' + url + '">');
     }
+  } else {
+    $('#urlInputs').append('<input data-id="url" type="text">');
   }
   if(data.local) {
     $("#local").prop("checked",true);
@@ -184,15 +184,15 @@ $(function(){
     var error = [];
     var url = [];
     var urlInputs = $("[data-id='url']");
-    urlInputs.forEach(function(url) {
-      var urlValue = $(url).val()
+    $.each(urlInputs, function(index, urlInput) {
+      var urlValue = $(urlInput).val().trim();
       if(urlValue && (urlValue.indexOf("http://") >= 0 || urlValue.indexOf("https://") >= 0 )) {
         url.push(urlValue)
-      } else {
-        error.push("Content URL must be valid.");
       }
-
     });
+    if(url.length == 0) {
+      error.push("Content URL must be valid.");
+    }
     var host = $('#host').val();
     var remote = $("#remote").is(':checked');
     var local = $("#local").is(':checked');
